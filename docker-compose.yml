@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  # Base de datos para Gestión de Pacientes
+  db_pacientes:
+    image: postgres:16.9
+    container_name: db_pacientes
+    environment:
+      POSTGRES_DB: db_pacientes
+      POSTGRES_USER: kym
+      POSTGRES_PASSWORD: kaymilyg
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_pacientes_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kym -d db_pacientes"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - red_odontologia
+
+  # Base de datos para Consultas y Diagnósticos
+  db_consultas:
+    image: postgres:16.9
+    container_name: db_consultas
+    environment:
+      POSTGRES_DB: db_consultas
+      POSTGRES_USER: kym
+      POSTGRES_PASSWORD: kaymilyg
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_consultas_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kym -d db_consultas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      db_pacientes:
+        condition: service_healthy
+    networks:
+      - red_odontologia
+
+  # Base de datos para Tratamientos
+  db_tratamientos:
+    image: postgres:16.9
+    container_name: db_tratamientos
+    environment:
+      POSTGRES_DB: db_tratamientos
+      POSTGRES_USER: kym
+      POSTGRES_PASSWORD: kaymilyg
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_tratamientos_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kym -d db_tratamientos"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      db_consultas:
+        condition: service_healthy
+    networks:
+      - red_odontologia
+
+  # Base de datos para Imágenes Médicas
+  db_imagenes:
+    image: postgres:16.9
+    container_name: db_imagenes
+    environment:
+      POSTGRES_DB: db_imagenes
+      POSTGRES_USER: kym
+      POSTGRES_PASSWORD: kaymilyg
+    ports:
+      - "5435:5432"
+    volumes:
+      - db_imagenes_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kym -d db_imagenes"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - red_odontologia
+
+  # Base de datos para Autenticación
+  db_auth:
+    image: postgres:16.9
+    container_name: db_auth
+    environment:
+      POSTGRES_DB: db_auth
+      POSTGRES_USER: kym
+      POSTGRES_PASSWORD: kaymilyg
+    ports:
+      - "5436:5432"
+    volumes:
+      - db_auth_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kym -d db_auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - red_odontologia
+
+volumes:
+  db_pacientes_data:
+  db_consultas_data:
+  db_tratamientos_data:
+  db_imagenes_data:
+  db_auth_data:
+
+networks:
+  red_odontologia:
+    driver: bridge
